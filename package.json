@@ -1,0 +1,35 @@
+{
+  "name": "backend-teraka",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node ace serve --watch",
+    "build": "node ace build --production --ignore-ts-errors",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^5.9.5",
+    "@types/proxy-addr": "^2.0.0",
+    "@types/source-map-support": "^0.5.6",
+    "adonis-preset-ts": "^2.1.0",
+    "pino-pretty": "^9.1.1",
+    "typescript": "~4.6",
+    "youch": "^3.2.2",
+    "youch-terminal": "^2.1.5"
+  },
+  "dependencies": {
+    "@adonisjs/auth": "^8.2.3",
+    "@adonisjs/core": "^5.9.0",
+    "@adonisjs/lucid": "^18.3.0",
+    "@adonisjs/mail": "^8.1.2",
+    "@adonisjs/repl": "^3.1.11",
+    "@adonisjs/view": "^6.2.0",
+    "jsonwebtoken": "^9.0.0",
+    "kickbox": "^2.0.4",
+    "luxon": "^3.2.1",
+    "mysql2": "^3.0.1",
+    "proxy-addr": "^2.0.7",
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.21"
+  }
+}
