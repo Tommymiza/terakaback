@@ -65,23 +65,27 @@ export default class MembresController {
       });
       const mailto: string = user.email;
       const url: string = `http://13.112.105.248/verify/add/${token}`;
-      Mail.send((message) => {
-        message
-          .encoding("utf-8")
-          .embed(Application.publicPath("/images/logo.png"), "image-id-logo")
-          .from("noreply@teraka.com")
-          .to(mailto)
-          .subject("Vérification d'email").html(`
-          <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
-                <img src="cid:image-id-logo" alt="Logo teraka" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
-                <h1 style="text-align: center">
-                    Vérification d'Email:
-                </h1>
-                <p style="text-align: center">En acceptant les conditions d'utilisation de notre site, vous devriez vérifier votre email en cliquant sur le lien ci-dessous</p>
-                <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
-            </div>
-        `);
-      });
+      try {
+          await Mail.send((message) => {
+          message
+            .encoding("utf-8")
+            .embed(Application.publicPath("/images/logo.png"), "image-id-logo")
+            .from("noreply@teraka.com")
+            .to(mailto)
+            .subject("Vérification d'email").html(`
+            <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
+                  <img src="cid:image-id-logo" alt="Logo teraka" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
+                  <h1 style="text-align: center">
+                      Vérification d'Email:
+                  </h1>
+                  <p style="text-align: center">En acceptant les conditions d'utilisation de notre site, vous devriez vérifier votre email en cliquant sur le lien ci-dessous</p>
+                  <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
+              </div>
+          `);
+        });
+      } catch (error) {
+        console.log(error)
+      }
     }
     const message: string = "Ajout terminé";
     if (user.email) {

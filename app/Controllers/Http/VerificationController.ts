@@ -53,6 +53,7 @@ export default class VerficationController {
       });
       response.send({ message: "Lien envoyé avec succès!" });
     } catch (error) {
+      console.log(error)
       response.send({ error: "Veuillez réessayer" });
     }
     response.finish();
