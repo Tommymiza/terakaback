@@ -32,7 +32,7 @@ export default class VerficationController {
       expiresIn: 5 * 60,
     });
     const mailto: string = email;
-    const url: string = `http://13.112.105.248/verify/add/${token}`;
+    const url: string = `http://13.112.105.248:4422/verify/add/${token}`;
     try {
       await Mail.send((message) => {
         message
@@ -54,7 +54,7 @@ export default class VerficationController {
       response.send({ message: "Lien envoyé avec succès!" });
     } catch (error) {
       console.log(error)
-      response.send({ error: "Veuillez réessayer" });
+      response.send(error);
     }
     response.finish();
   }
