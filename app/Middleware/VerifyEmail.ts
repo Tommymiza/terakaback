@@ -12,7 +12,7 @@ export default class VerifyMail {
   ) {
     if (request.body().email) {
       const verify: any = await new Promise((resolve, reject) => {
-        kickbox.verify(request.body().email, (err, result) => {
+        kickbox.verify(request.body().email, (err: object, result: object) => {
           if (err) {
             reject(err);
           } else {

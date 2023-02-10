@@ -13,7 +13,7 @@ export default class Membre extends BaseModel {
   public prenom: string
 
   @column()
-  public date_naissance: Date
+  public date_naissance: Date | string
 
   @column()
   public metier: string

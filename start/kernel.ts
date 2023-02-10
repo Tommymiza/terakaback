@@ -41,5 +41,6 @@ Server.middleware.register([
 |
 */
 Server.middleware.registerNamed({
-  verifyEmail: () => import('App/Middleware/VerifyEmail')
+  verifyEmail: () => import('App/Middleware/VerifyEmail'),
+  authStaff: () => import('App/Middleware/AuthStaff')
 })
