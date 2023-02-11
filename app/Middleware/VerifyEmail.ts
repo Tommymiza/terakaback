@@ -21,7 +21,7 @@ export default class VerifyMail {
         });
       });
       if (verify.body?.result !== "deliverable") {
-        const message: string = `L'email ${request.body().email} n'existe pas!`;
+        const message: string = `Tsy misy io mailaka io mail: ${request.body().email}`;
         response.abort({ message }, 403);
         return;
       }

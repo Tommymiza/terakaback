@@ -88,7 +88,7 @@ export default class MembresController {
         `);
       });
     }
-    const message: string = "Ajout terminé";
+    const message: string = "Tontosa ny fampidirana";
     if (user.email) {
       const tokenUser = await jwt.sign(
         { email: user.email },
