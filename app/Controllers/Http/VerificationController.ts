@@ -32,7 +32,7 @@ export default class VerficationController {
       expiresIn: 5 * 60,
     });
     const mailto: string = email;
-    const url: string = `http://13.112.105.248/verify/add/${token}`;
+    const url: string = `https://api.teraka.org/verify/add/${token}`;
     try {
       await Mail.send((message) => {
         message

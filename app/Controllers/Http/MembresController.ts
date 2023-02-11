@@ -69,7 +69,7 @@ export default class MembresController {
         expiresIn: 5 * 60,
       });
       const mailto: string = user.email;
-      const url: string = `http://13.112.105.248/verify/add/${token}`;
+      const url: string = `https://api.teraka.org/verify/add/${token}`;
       Mail.send((message) => {
         message
           .encoding("utf-8")
