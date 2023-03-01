@@ -8,19 +8,19 @@ export default class extends BaseSchema {
       table.increments("id");
       table.string("nom", 255).notNullable();
       table.string("prenom", 255).notNullable();
-      table.date("date_naissance").notNullable();
-      table.enum("genre", ["M", "F"]).notNullable();
-      table.string("metier", 255).notNullable();
-      table.json("adresse").notNullable();
-      table.string("phone", 255).notNullable();
+      table.string("pseudo", 255).notNullable().unique();
+      table.string("password", 255).notNullable();
       table.string("email", 255).nullable().unique();
-      table.string("password", 255).nullable();
-      table.json("qst").notNullable();
+      table.string("ln", 2).notNullable();
+      table.string("time", 2).nullable();
+      table.json("adresse").notNullable();
+      table.string("role", 255).notNullable();
+      table.string("is_pg", 255).notNullable();
+      table.string("pg_number", 255).nullable();
       table.boolean("is_verified").defaultTo(false);
       table.bigInteger("num_cin").nullable();
       table.string("photo_cin", 255).nullable();
       table.string("photo", 255).nullable();
-      table.integer("id_pg", 10).nullable();
       table.json("staff").nullable();
 
       /**

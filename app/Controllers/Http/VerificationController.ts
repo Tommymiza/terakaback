@@ -40,20 +40,21 @@ export default class VerficationController {
           .embed(Application.publicPath("/images/logo.png"), "image-id-logo")
           .from("noreply@teraka.com")
           .to(mailto)
-          .subject("Vérification d'email").html(`
-                <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
-                      <img src="cid:image-id-logo" alt="Logo teraka" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
-                      <h1 style="text-align: center">
-                          Vérification d'Email:
-                      </h1>
-                      <p style="text-align: center">En acceptant les conditions d'utilisation de notre site, vous devriez vérifier votre email en cliquant sur le lien ci-dessous</p>
-                      <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
-                  </div>
-              `);
+          .subject("Validation email").html(`
+          <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
+                <img src="cid:image-id-logo" alt="Logo teraka" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
+                <h1 style="text-align: center">
+                  Vérification d'email:
+                </h1>
+                <p style="text-align: center">Pour profiter nos services, veuillez vérifier votre email</p>
+                <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
+            </div>
+        `);
       });
-      response.send({ message: "Lien envoyé avec succès!" });
+      response.send({ message: "Visitez votre email" });
     } catch (error) {
-      response.send({ error: "Veuillez réessayer" });
+      console.log(error)
+      response.send({ error: "Réessayer plus tard..." });
     }
     response.finish();
   }

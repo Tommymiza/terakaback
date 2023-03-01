@@ -5,103 +5,103 @@ import jwt from "jsonwebtoken";
 import Mail from "@ioc:Adonis/Addons/Mail";
 import Application from "@ioc:Adonis/Core/Application";
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
+import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class MembresController {
   public async addMember({ request, response }: HttpContextContract) {
     interface TUser {
       nom: string;
       prenom: string;
-      date_naissance: Date;
-      metier: string;
-      phone: string;
-      adresse: JSON;
-      genre: string;
+      pseudo: string;
+      password: string;
       email: string | null;
-      password: string | null;
-      qst: JSON;
+      ln: string;
+      time: string | null;
+      adresse: JSON;
+      role: string;
+      is_pg: string;
+      pg_number: string | null;
     }
     const body: any = request.body();
     const {
       nom,
       prenom,
-      date_naissance,
-      metier,
-      phone,
-      adresse,
-      genre,
-      email,
+      pseudo,
       password,
-      qst,
+      email,
+      ln,
+      time,
+      adresse,
+      role,
+      is_pg,
+      pg_number,
     }: TUser = body;
-    if (email) {
-      const schemas = schema.create({
-        email: schema.string([
-          rules.email(),
-          rules.unique({ table: "membres", column: "email" }),
-        ]),
-        password: schema.string([rules.minLength(8)]),
+    try {
+      const user = await Membre.create({
+        nom,
+        prenom,
+        pseudo,
+        password,
+        email,
+        ln,
+        time,
+        adresse,
+        role,
+        is_pg,
+        pg_number,
       });
-      try {
-        await request.validate({
-          schema: schemas,
-        });
-      } catch (error) {
-        var messages: Array<string> = error.messages.errors.map(
-          (item: { message: string }) => item.message
+      if (user.email) {
+        const token = await jwt.sign(
+          { email: user.email },
+          Env.get("API_KEY"),
+          {
+            expiresIn: 5 * 60,
+          }
         );
-        response.abort({ message: messages.join(", ") }, 403);
+        const mailto: string = user.email;
+        const url: string = `https://api.teraka.org/verify/add/${token}`;
+        try {
+          const mail = await Mail.send((message) => {
+            message
+              .encoding("utf-8")
+              .embed(
+                Application.publicPath("/images/logo.png"),
+                "image-id-logo"
+              )
+              .from("noreply@teraka.com")
+              .to(mailto)
+              .subject("Validation email").html(`
+                <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
+                    <img src="cid:image-id-logo" alt="Logo TERAKA" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
+                    <h1 style="text-align: center">
+                        Vérification d'email:
+                    </h1>
+                    <p style="text-align: center">Pour profiter nos services, veuillez vérifier votre email</p>
+                    <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
+                </div>
+            `);
+          });
+          console.log(mail);
+        } catch (error) {
+          console.log(error);
+          response.status(200);
+          const message = "Envoi d'email de vérification échoué!";
+          response.send({ message });
+          response.finish();
+        }
       }
-    }
-    const user = await Membre.create({
-      nom,
-      prenom,
-      date_naissance,
-      metier,
-      phone,
-      adresse,
-      genre,
-      email,
-      password,
-      qst,
-    });
-    if (user.email) {
-      const token = await jwt.sign({ email: user.email }, Env.get("API_KEY"), {
-        expiresIn: 5 * 60,
-      });
-      const mailto: string = user.email;
-      const url: string = `https://api.teraka.org/verify/add/${token}`;
-      Mail.send((message) => {
-        message
-          .encoding("utf-8")
-          .embed(Application.publicPath("/images/logo.png"), "image-id-logo")
-          .from("noreply@teraka.com")
-          .to(mailto)
-          .subject("Vérification d'email").html(`
-          <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
-                <img src="cid:image-id-logo" alt="Logo teraka" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
-                <h1 style="text-align: center">
-                    Vérification d'Email:
-                </h1>
-                <p style="text-align: center">En acceptant les conditions d'utilisation de notre site, vous devriez vérifier votre email en cliquant sur le lien ci-dessous</p>
-                <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
-            </div>
-        `);
-      });
-    }
-    const message: string = "Tontosa ny fampidirana";
-    if (user.email) {
       const tokenUser = await jwt.sign(
-        { email: user.email },
+        { email: user.pseudo },
         Env.get("API_KEY"),
         { expiresIn: "30d" }
       );
+      const message = "L'ajout est effectuée!";
       response.status(200);
       response.send({ message, tokenUser });
       response.finish();
-    } else {
-      response.status(200);
-      response.send({ message });
-      response.finish();
+    } catch (error) {
+      console.log(error);
+      response.abort({error: error}, 403);
     }
   }
   public async login({ request, response, auth }: HttpContextContract) {
@@ -115,9 +115,9 @@ export default class MembresController {
       });
     } catch (error) {
       if (error.responseText === "E_INVALID_AUTH_UID: User not found") {
-        response.send({ message: "Email introuvable!" });
+        response.send({ message: "L'utilisateur n'existe pas" });
       } else {
-        response.send({ message: "Mot de passe erroné!" });
+        response.send({ message: "Le mot de passe est incorrect" });
       }
     }
   }
@@ -126,7 +126,7 @@ export default class MembresController {
       const tokenUser = await auth.use("api").authenticate();
       response.send({ user: tokenUser.$original });
     } catch (error) {
-      response.abort({ message: "Error de connexion!" }, 401);
+      response.abort({ message: "Veuillez réessayer!" }, 401);
     }
     response.finish();
   }
@@ -134,8 +134,10 @@ export default class MembresController {
     await auth.logout();
     response.finish();
   }
-  public async all({ response }: HttpContextContract) {
-    const users = await Membre.all();
+  public async all({ request, response }: HttpContextContract) {
+    const page = request.input("page", 1);
+    const limit = 10;
+    const users = await Database.from("membres").paginate(page, limit);
     users.forEach((item) => {
       const datenais = new Date(item.date_naissance);
       const day =

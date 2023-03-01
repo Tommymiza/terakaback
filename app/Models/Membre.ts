@@ -13,29 +13,32 @@ export default class Membre extends BaseModel {
   public prenom: string
 
   @column()
-  public date_naissance: Date | string
+  public pseudo: string
+  
+  @column()
+  public password: string
+  
+  @column()
+  public email: string | null
 
   @column()
-  public metier: string
+  public ln: string
 
   @column()
-  public phone: string
+  public time: string | null
 
   @column()
   public adresse: JSON
 
   @column()
-  public genre: string
+  public role: string
 
   @column()
-  public email: string | null
-
-  @column({serializeAs: null})
-  public password: string | null
+  public is_pg: string
 
   @column()
-  public qst: JSON
-
+  public pg_number: string | null
+  
   @column()
   public is_verified: boolean | false
 
@@ -48,8 +51,6 @@ export default class Membre extends BaseModel {
   @column()
   public num_cin: bigint | null
 
-  @column()
-  public id_pg: number | null
 
   @column()
   public staff: JSON | null

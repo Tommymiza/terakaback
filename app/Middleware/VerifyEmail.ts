@@ -1,9 +1,6 @@
-var kickbox = require("kickbox")
-  .client(
-    "live_fc67d0a50e5b238848197284678c1ea05d0992bc061dd8a8450bab0e3074acd7"
-  )
-  .kickbox();
+var emailVerify = require("kickbox").client("live_d2f1e696c72fc53afb00d7f848fde71552032e84613a95908bd17f76a048018f").kickbox();
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Env from "@ioc:Adonis/Core/Env"
 
 export default class VerifyMail {
   public async handle(
@@ -11,8 +8,8 @@ export default class VerifyMail {
     next: () => Promise<void>
   ) {
     if (request.body().email) {
-      const verify: any = await new Promise((resolve, reject) => {
-        kickbox.verify(request.body().email, (err: object, result: object) => {
+      const verify: any =  await new Promise((resolve, reject) => {
+        emailVerify.verify(request.body().email, (err: object, result: object) => {
           if (err) {
             reject(err);
           } else {
@@ -20,9 +17,8 @@ export default class VerifyMail {
           }
         });
       });
-      if (verify.body?.result !== "deliverable") {
-        const message: string = `Tsy misy io mailaka io mail: ${request.body().email}`;
-        response.abort({ message }, 403);
+      if(verify.body.result !== "deliverable"){
+        response.abort({error: "Cet email n'existe pas"}, 403)
         return;
       }
     }
