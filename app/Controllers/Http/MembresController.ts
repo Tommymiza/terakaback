@@ -4,11 +4,10 @@ import Env from "@ioc:Adonis/Core/Env";
 import jwt from "jsonwebtoken";
 import Mail from "@ioc:Adonis/Addons/Mail";
 import Application from "@ioc:Adonis/Core/Application";
-import { schema, rules } from "@ioc:Adonis/Core/Validator";
 import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class MembresController {
-  public async addMember({ request, response }: HttpContextContract) {
+  public async addMember({ request, response, auth }: HttpContextContract) {
     interface TUser {
       nom: string;
       prenom: string;
@@ -90,28 +89,30 @@ export default class MembresController {
           response.finish();
         }
       }
-      const tokenUser = await jwt.sign(
-        { email: user.pseudo },
-        Env.get("API_KEY"),
-        { expiresIn: "30d" }
-      );
+      const user_connected = await auth.attempt(pseudo, password);
       const message = "L'ajout est effectuée!";
       response.status(200);
-      response.send({ message, tokenUser });
+      response.send({
+        message,
+        token: user_connected.token,
+        user,
+        // tokenHash: user_connected.tokenHash,
+      });
       response.finish();
     } catch (error) {
       console.log(error);
-      response.abort({error: error}, 403);
+      response.abort({ error: error }, 403);
     }
   }
   public async login({ request, response, auth }: HttpContextContract) {
-    const { email, password } = request.body();
+    const { pseudo, password } = request.body();
     try {
-      const user = await auth.attempt(email, password);
+      const user = await auth.attempt(pseudo, password);
       response.send({
-        message: "success",
+        message: "Bienvenue à bord!",
         user: user.user.$original,
         token: user.token,
+        // tokenHash: user.tokenHash,
       });
     } catch (error) {
       if (error.responseText === "E_INVALID_AUTH_UID: User not found") {
@@ -123,16 +124,22 @@ export default class MembresController {
   }
   public async check({ response, auth }: HttpContextContract) {
     try {
-      const tokenUser = await auth.use("api").authenticate();
-      response.send({ user: tokenUser.$original });
+      const user = await auth.use("api").authenticate();
+      response.send({ user: user.$original });
     } catch (error) {
-      response.abort({ message: "Veuillez réessayer!" }, 401);
+      response.abort({ error: "Veuillez réessayer!" }, 401);
     }
     response.finish();
   }
   public async logout({ response, auth }: HttpContextContract) {
-    await auth.logout();
-    response.finish();
+    try {
+      await auth.use("api").revoke();
+      response.status(200);
+      response.finish();
+    } catch (error) {
+      console.log(error);
+      response.abort({ error: "Veuillez réesayer!" }, 500);
+    }
   }
   public async all({ request, response }: HttpContextContract) {
     const page = request.input("page", 1);

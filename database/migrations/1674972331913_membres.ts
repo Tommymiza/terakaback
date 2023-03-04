@@ -12,7 +12,7 @@ export default class extends BaseSchema {
       table.string("password", 255).notNullable();
       table.string("email", 255).nullable().unique();
       table.string("ln", 2).notNullable();
-      table.string("time", 2).nullable();
+      table.string("time", 255).nullable();
       table.json("adresse").notNullable();
       table.string("role", 255).notNullable();
       table.string("is_pg", 255).notNullable();
