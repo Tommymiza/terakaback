@@ -51,11 +51,12 @@ export default class VerficationController {
             </div>
         `);
       });
-      response.send({ message: "Visitez votre email" });
+      response.status(200);
+      response.send({ message: "Visitez votre email!" });
+      response.finish();
     } catch (error) {
       console.log(error)
-      response.send({ error: "Réessayer plus tard..." });
+      response.abort({ error: "Réessayer plus tard..."}, 503);
     }
-    response.finish();
   }
 }

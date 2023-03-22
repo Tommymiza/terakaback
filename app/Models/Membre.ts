@@ -20,12 +20,12 @@ export default class Membre extends BaseModel {
   
   @column()
   public email: string | null
-
+  
+  @column()
+  public phone: string | null
+  
   @column()
   public ln: string
-
-  @column()
-  public time: string | null
 
   @column()
   public adresse: JSON
@@ -35,9 +35,6 @@ export default class Membre extends BaseModel {
 
   @column()
   public is_pg: string
-
-  @column()
-  public pg_number: string | null
   
   @column()
   public is_verified: boolean | false

@@ -15,8 +15,8 @@ export default class MembresController {
       password: string;
       email: string | null;
       ln: string;
-      time: string | null;
       adresse: JSON;
+      phone: string | null;
       role: string;
       is_pg: string;
       pg_number: string | null;
@@ -29,11 +29,10 @@ export default class MembresController {
       password,
       email,
       ln,
-      time,
       adresse,
+      phone,
       role,
       is_pg,
-      pg_number,
     }: TUser = body;
     try {
       const user = await Membre.create({
@@ -43,11 +42,10 @@ export default class MembresController {
         password,
         email,
         ln,
-        time,
         adresse,
+        phone,
         role,
         is_pg,
-        pg_number,
       });
       if (user.email) {
         const token = await jwt.sign(
@@ -67,7 +65,7 @@ export default class MembresController {
                 Application.publicPath("/images/logo.png"),
                 "image-id-logo"
               )
-              .from("noreply@teraka.com")
+              .from("noreply@teraka.org")
               .to(mailto)
               .subject("Validation email").html(`
                 <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
@@ -83,10 +81,7 @@ export default class MembresController {
           console.log(mail);
         } catch (error) {
           console.log(error);
-          response.status(200);
-          const message = "Envoi d'email de vérification échoué!";
-          response.send({ message });
-          response.finish();
+          response.abort({ error: "Echec d'envoi de l'email" }, 503);
         }
       }
       const user_connected = await auth.attempt(pseudo, password);
@@ -101,7 +96,16 @@ export default class MembresController {
       response.finish();
     } catch (error) {
       console.log(error);
-      response.abort({ error: error }, 403);
+      if (error.sqlMessage) {
+        if (error.sqlMessage.includes("email_unique")) {
+          response.abort({ error: "Cet email est déjà utilisé" }, 503);
+        } else if (error.sqlMessage.includes("pseudo_unique")) {
+          response.abort({ error: "Le pseudo est déjà utilisé" }, 503);
+        } else {
+          response.abort({ error: error.sqlMessage }, 503);
+        }
+      }
+      response.abort({ error: "Erreur d'ajout" }, 503);
     }
   }
   public async login({ request, response, auth }: HttpContextContract) {
@@ -116,9 +120,9 @@ export default class MembresController {
       });
     } catch (error) {
       if (error.responseText === "E_INVALID_AUTH_UID: User not found") {
-        response.send({ message: "L'utilisateur n'existe pas" });
+        response.abort({ error: "L'utilisateur n'existe pas" }, 403);
       } else {
-        response.send({ message: "Le mot de passe est incorrect" });
+        response.abort({ error: "Le mot de passe est incorrect" }, 403);
       }
     }
   }
@@ -127,7 +131,7 @@ export default class MembresController {
       const user = await auth.use("api").authenticate();
       response.send({ user: user.$original });
     } catch (error) {
-      response.abort({ error: "Veuillez réessayer!" }, 401);
+      response.abort({ error: "Session expirée!" }, 401);
     }
     response.finish();
   }
