@@ -22,7 +22,7 @@ export default class extends BaseSchema {
       table.string("photo_cin", 255).nullable();
       table.string("photo", 255).nullable();
       table.json("staff").nullable();
-
+      table.string("id_pg", 255).nullable();
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

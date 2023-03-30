@@ -19,6 +19,7 @@ export default class MembresController {
       phone: string | null;
       role: string;
       is_pg: string;
+      id_pg: string | null;
       pg_number: string | null;
     }
     const body: any = request.body();
@@ -33,6 +34,7 @@ export default class MembresController {
       phone,
       role,
       is_pg,
+      id_pg,
     }: TUser = body;
     try {
       const user = await Membre.create({
@@ -46,6 +48,7 @@ export default class MembresController {
         phone,
         role,
         is_pg,
+        id_pg,
       });
       if (user.email) {
         const token = await jwt.sign(

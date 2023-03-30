@@ -35,6 +35,9 @@ export default class Membre extends BaseModel {
 
   @column()
   public is_pg: string
+
+  @column()
+  public id_pg: string | null
   
   @column()
   public is_verified: boolean | false
