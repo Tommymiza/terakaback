@@ -168,4 +168,14 @@ export default class MembresController {
     response.send({ items: users });
     response.finish();
   }
+  public async updateFormation({request, response, auth}: HttpContextContract){
+    try {
+      await auth.use("api").authenticate();
+      await Membre.query().where('id', request.body().id).update('formation', `${JSON.stringify(request.body().formation)}`);
+    } catch (error) {
+      console.log(error)
+      response.abort({ error: "Modification base de donnée échouée!" }, 503);
+    }
+    response.finish();
+  }
 }

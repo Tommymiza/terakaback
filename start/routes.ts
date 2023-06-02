@@ -25,6 +25,7 @@ Route.get('/', async () => {
 })
 Route.post('/ajoutmembre', "MembresController.addMember").middleware('verifyEmail')
 Route.post("/login", "MembresController.login").as("login")
+Route.post("/updateformation", "MembresController.updateFormation")
 Route.get("/getuser", "MembresController.check")
 Route.post("/logout", "MembresController.logout").as("logout")
 Route.get("/verify/add/:token", "VerificationController.ajoutMembre")

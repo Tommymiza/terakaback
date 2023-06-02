@@ -31,6 +31,9 @@ export default class Membre extends BaseModel {
   public adresse: JSON
 
   @column()
+  public formation: JSON | {}
+
+  @column()
   public role: string
 
   @column()

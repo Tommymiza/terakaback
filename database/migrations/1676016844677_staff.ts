@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string("email_staff", 255).unique().notNullable()
+      table.string("email_staff", 100).unique().notNullable()
       table.string("password_staff", 255).notNullable()
       table.enum("fonction", ["admin", "staff"]).notNullable()
       table.boolean("is_staff_verified").defaultTo(false);
