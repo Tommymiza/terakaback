@@ -1,30 +1,33 @@
-var emailVerify = require("kickbox")
-  .client(
-    "live_d2f1e696c72fc53afb00d7f848fde71552032e84613a95908bd17f76a048018f"
-  )
-  .kickbox();
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import axios from "axios";
+
 export default class VerifyMail {
   public async handle(
     { request, response }: HttpContextContract,
     next: () => Promise<void>
   ) {
     if (request.body().email) {
-      const verify: any = await new Promise((resolve, reject) => {
-        emailVerify.verify(
-          request.body().email,
-          (err: object, result: object) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result);
-            }
-          }
-        );
+      const promise: any = await new Promise((resolve, reject) => {
+        const apiKey = "458c485f90e740e5b62f298506505e9e";
+        const apiUrl = `https://api.zerobounce.net/v2/validate?api_key=${apiKey}&email=${request.body().email}`;
+
+        axios
+          .get(apiUrl)
+          .then((response) => {
+            const data = response.data;
+            resolve(data)
+          })
+          .catch((error) => {
+            console.error(
+              "Une erreur est survenue lors de la vérification de l'email.",
+              error
+            );
+            reject(error)
+          });
       });
-      if (verify.body.result !== "deliverable") {
-        response.abort({ error: "Cet email n'existe pas" }, 403);
-        return;
+      console.log(promise);
+      if (promise.status !== "valid") {
+        response.abort({ error: "Email n'existe pas!" }, 403);
       }
     }
     await next();

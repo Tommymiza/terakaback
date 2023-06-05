@@ -37,28 +37,15 @@ export default class MembresController {
       id_pg,
     }: TUser = body;
     try {
-      const user = await Membre.create({
-        nom,
-        prenom,
-        pseudo,
-        password,
-        email,
-        ln,
-        adresse,
-        phone,
-        role,
-        is_pg,
-        id_pg,
-      });
-      if (user.email) {
+      if (body.email) {
         const token = await jwt.sign(
-          { email: user.email },
+          { email: body.email },
           Env.get("API_KEY"),
           {
             expiresIn: 5 * 60,
           }
         );
-        const mailto: string = user.email;
+        const mailto: string = body.email;
         const url: string = `https://api.teraka.org/verify/add/${token}`;
         try {
           const mail = await Mail.send((message) => {
@@ -81,12 +68,24 @@ export default class MembresController {
                 </div>
             `);
           });
-          console.log(mail);
         } catch (error) {
           console.log(error);
           response.abort({ error: "Echec d'envoi de l'email" }, 503);
         }
       }
+      const user = await Membre.create({
+        nom,
+        prenom,
+        pseudo,
+        password,
+        email,
+        ln,
+        adresse,
+        phone,
+        role,
+        is_pg,
+        id_pg,
+      });
       const user_connected = await auth.attempt(pseudo, password);
       const message = "L'ajout est effectuée!";
       response.status(200);
@@ -168,12 +167,18 @@ export default class MembresController {
     response.send({ items: users });
     response.finish();
   }
-  public async updateFormation({request, response, auth}: HttpContextContract){
+  public async updateFormation({
+    request,
+    response,
+    auth,
+  }: HttpContextContract) {
     try {
       await auth.use("api").authenticate();
-      await Membre.query().where('id', request.body().id).update('formation', `${JSON.stringify(request.body().formation)}`);
+      await Membre.query()
+        .where("id", request.body().id)
+        .update("formation", `${JSON.stringify(request.body().formation)}`);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       response.abort({ error: "Modification base de donnée échouée!" }, 503);
     }
     response.finish();
