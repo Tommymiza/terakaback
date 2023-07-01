@@ -19,11 +19,7 @@ export default class VerficationController {
         return view.render("token", { error: "Token invalid!" });
       }
     } catch (error) {
-      console.log("Error");
-
-      if (error) {
-        return view.render("token", { error: "Token expiré!" });
-      }
+      return view.render("token", { error: "Token expiré!" });
     }
   }
   public async sendToken({ request, response }: HttpContextContract) {
@@ -55,8 +51,25 @@ export default class VerficationController {
       response.send({ message: "Visitez votre email!" });
       response.finish();
     } catch (error) {
-      console.log(error)
-      response.abort({ error: "Réessayer plus tard..."}, 503);
+      console.log(error);
+      response.abort({ error: "Réessayer plus tard..." }, 503);
+    }
+  }
+  public async resetPassword({ request, view }: HttpContextContract) {
+    const token = request.param("token");
+    try {
+      const payload = jwt.verify(token, Env.get("API_KEY"));
+      const user = await Membre.findBy("email", payload.email);
+      if (user) {
+        user.is_verified = true;
+        await user.save();
+        return view.render("reset", { token: token });
+      } else {
+        return view.render("token", { error: "Token invalid!" });
+      }
+    } catch (error) {
+      console.log("Error");
+      return view.render("token", { error: "Token expiré!" });
     }
   }
 }

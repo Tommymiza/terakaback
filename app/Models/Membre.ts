@@ -14,7 +14,13 @@ export default class Membre extends BaseModel {
 
   @column()
   public pseudo: string
-  
+
+  @column()
+  public questionnaire: number
+
+  @column()
+  public reponse: string
+
   @column()
   public password: string
   
@@ -23,9 +29,6 @@ export default class Membre extends BaseModel {
   
   @column()
   public phone: string | null
-  
-  @column()
-  public ln: string
 
   @column()
   public adresse: JSON
@@ -46,18 +49,7 @@ export default class Membre extends BaseModel {
   public is_verified: boolean | false
 
   @column()
-  public photo_cin: string | null
-
-  @column()
-  public photo: string | null
-
-  @column()
-  public num_cin: bigint | null
-
-
-  @column()
-  public staff: JSON | null
-
+  public ln: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

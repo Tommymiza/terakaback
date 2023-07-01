@@ -46,9 +46,9 @@ export default class MembresController {
           }
         );
         const mailto: string = body.email;
-        const url: string = `https://api.teraka.org/verify/add/${token}`;
+        const url: string = `${Env.get("DOMAIN")}/verify/add/${token}`;
         try {
-          const mail = await Mail.send((message) => {
+          await Mail.send((message) => {
             message
               .encoding("utf-8")
               .embed(
@@ -59,7 +59,7 @@ export default class MembresController {
               .to(mailto)
               .subject("Validation email").html(`
                 <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
-                    <img src="cid:image-id-logo" alt="Logo TERAKA" style="display: block;width: 400px;margin-left: auto;margin-right:auto;">
+                    <img src="cid:image-id-logo" alt="Logo TERAKA" style="display: block;width: 200px;margin-left: auto;margin-right:auto;">
                     <h1 style="text-align: center">
                         Vérification d'email:
                     </h1>
@@ -147,6 +147,22 @@ export default class MembresController {
       response.abort({ error: "Veuillez réesayer!" }, 500);
     }
   }
+  public async updateFormation({
+    request,
+    response,
+    auth,
+  }: HttpContextContract) {
+    try {
+      await auth.use("api").authenticate();
+      await Membre.query()
+        .where("id", request.body().id)
+        .update("formation", `${JSON.stringify(request.body().formation)}`);
+    } catch (error) {
+      console.log(error);
+      response.abort({ error: "Modification base de donnée échouée!" }, 503);
+    }
+    response.finish();
+  }
   public async all({ request, response }: HttpContextContract) {
     const page = request.input("page", 1);
     const limit = 10;
@@ -167,20 +183,95 @@ export default class MembresController {
     response.send({ items: users });
     response.finish();
   }
-  public async updateFormation({
-    request,
-    response,
-    auth,
-  }: HttpContextContract) {
+  public async resetpassFindUser({ request, response }: HttpContextContract) {
+    const { username }: any = request.qs();
     try {
-      await auth.use("api").authenticate();
-      await Membre.query()
-        .where("id", request.body().id)
-        .update("formation", `${JSON.stringify(request.body().formation)}`);
+      const user = await Membre.findByOrFail("pseudo", username);
+      response.send({
+        user: { email: user.email, question: user.questionnaire, id: user.id },
+      });
+      response.finish();
+    } catch (error) {
+      response.abort({ error: "Pas d'utilisateur valide!" }, 403);
+    }
+  }
+  public async sendTokenmail({ request, response }: HttpContextContract) {
+    const { email }: any = request.body();
+    try {
+      const curr = await Membre.findByOrFail("email", email);
+      const token = await jwt.sign({ pseudo: curr.pseudo }, Env.get("API_KEY"), {
+        expiresIn: 5 * 60,
+      });
+      const url: string = `${Env.get("FRONT_DOMAIN")}/renew/${token}`;
+      try {
+        await Mail.send((message) => {
+          message
+            .encoding("utf-8")
+            .from("tommymiza6@gmail.com")
+            .embed(
+              Application.publicPath("/images/logo.png"),
+              "image-id-logo"
+            )
+            .to(email)
+            .subject("Validation email").html(`
+            <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Document</title>
+              </head>
+                <body>
+                  <img src="cid:image-id-logo" alt="Logo TERAKA" style="display: block;width: 200px;margin-left: auto;margin-right:auto;">
+                  <h1 style="text-align: center">
+                  Vérification d'email:
+                  </h1>
+                  <p style="text-align: center">Pour profiter nos services, veuillez vérifier votre email</p>
+                  <a style="display: block;width: 100px;text-align:center;text-decoration: none;background: #3e5151;border: none;font-size: 20px;padding: 10px;border-radius: 7px;color: #decba4;margin-left: auto;margin-right:auto;" href="${url}">Vérifier</a>
+                </body>
+              </html>
+            `);
+        });
+        response.send({ message: "Lien envoyé, vérifier votre boîte email" });
+        response.finish();
+      } catch (error) {
+        console.log(error);
+        response.abort({ error: "Echec d'envoi de l'email" }, 503);
+      }
+    } catch (error) {
+      response.abort({error: "Utilisateur invalide!"}, 403);
+    }
+  }
+  public async checkqst({ request, response }: HttpContextContract) {
+    const { id, reponse }: any = request.body();
+    try {
+      const curr: Membre = await Membre.findOrFail(id);
+      if (!curr.reponse.includes(reponse)) throw new Error("Réponse incorrect");
+      const token = await jwt.sign(
+        { pseudo: curr.pseudo },
+        Env.get("API_KEY"),
+        {
+          expiresIn: 5 * 60,
+        }
+      );
+      const url: string = `/renew/${token}`;
+      response.send({ message: "Réponse correct", url });
+      response.finish();
     } catch (error) {
       console.log(error);
-      response.abort({ error: "Modification base de donnée échouée!" }, 503);
+      response.abort({ error: "Réponse incorrect" }, 403);
     }
-    response.finish();
+  }
+  public async modifypassword({ request, response }: HttpContextContract) {
+    const { pseudo, password }: any = request.body();
+    try {
+      const curr: Membre = await Membre.findByOrFail("pseudo", pseudo);
+      curr.password = password;
+      curr.save();
+      response.send({ message: "Mot de passe changé" });
+      response.finish();
+    } catch (error) {
+      console.log(error);
+      response.abort({ error: "Changement échoué" }, 403);
+    }
   }
 }
