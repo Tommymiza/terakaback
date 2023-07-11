@@ -21,6 +21,8 @@ export default class MembresController {
       is_pg: string;
       id_pg: string | null;
       pg_number: string | null;
+      qst: number;
+      reponse: string;
     }
     const body: any = request.body();
     const {
@@ -35,6 +37,8 @@ export default class MembresController {
       role,
       is_pg,
       id_pg,
+      qst, 
+      reponse
     }: TUser = body;
     try {
       if (body.email) {
@@ -85,6 +89,8 @@ export default class MembresController {
         role,
         is_pg,
         id_pg,
+        questionnaire: qst,
+        reponse
       });
       const user_connected = await auth.attempt(pseudo, password);
       const message = "L'ajout est effectuée!";
