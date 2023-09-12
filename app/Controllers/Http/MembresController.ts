@@ -59,7 +59,7 @@ export default class MembresController {
                 Application.publicPath("/images/logo.png"),
                 "image-id-logo"
               )
-              .from("noreply@teraka.org")
+              .from("contact@teraka.org")
               .to(mailto)
               .subject("Validation email").html(`
                 <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
@@ -210,10 +210,10 @@ export default class MembresController {
       });
       const url: string = `${Env.get("FRONT_DOMAIN")}/renew/${token}`;
       try {
-        await Mail.send((message) => {
+        const mail = await Mail.send((message) => {
           message
             .encoding("utf-8")
-            .from("tommymiza6@gmail.com")
+            .from("contact@teraka.org")
             .embed(
               Application.publicPath("/images/logo.png"),
               "image-id-logo"
@@ -237,6 +237,7 @@ export default class MembresController {
               </html>
             `);
         });
+        console.log(mail);
         response.send({ message: "Lien envoyé, vérifier votre boîte email" });
         response.finish();
       } catch (error) {

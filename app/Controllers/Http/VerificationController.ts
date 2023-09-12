@@ -34,7 +34,7 @@ export default class VerficationController {
         message
           .encoding("utf-8")
           .embed(Application.publicPath("/images/logo.png"), "image-id-logo")
-          .from("noreply@teraka.com")
+          .from("contact@teraka.org")
           .to(mailto)
           .subject("Validation email").html(`
           <div style="padding:20px;background: linear-gradient(to right, #3e5151, #decba4);">
