@@ -192,10 +192,12 @@ export default class MembresController {
   public async resetpassFindUser({ request, response }: HttpContextContract) {
     const { username }: any = request.qs();
     try {
-      const user = await Membre.findByOrFail("pseudo", username);
-      response.send({
-        user: { email: user.email, question: user.questionnaire, id: user.id },
-      });
+      const user = await Membre.query().where("pseudo", username).orWhere("email", username);
+      if(user.length > 0){
+        response.send({
+          user: { email: user[0].email, question: user[0].questionnaire, id: user[0].id },
+        });
+      }
       response.finish();
     } catch (error) {
       response.abort({ error: "Pas d'utilisateur valide!" }, 403);
