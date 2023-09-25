@@ -31,13 +31,6 @@ Route.post("/logout", "MembresController.logout").as("logout")
 Route.get("/verify/add/:token", "VerificationController.ajoutMembre")
 Route.get("/verify/reset/:token", "VerificationController.resetPassword")
 Route.post("/generate", "VerificationController.sendToken")
-Route.get("/getstaff", "StaffController.getinfo")
-Route.post("/loginstaff", "StaffController.login")
-Route.post("/ajoutstaff", "StaffController.add")
-Route.group(()=>{
-  Route.get("/membre/all", "MembresController.all")
-  Route.get("/staff/all", "StaffController.all")
-}).middleware("authStaff")
 Route.group(()=>{
   Route.get("/finduser", "MembresController.resetpassFindUser");
   Route.post("/sendTokenmail", "MembresController.sendTokenmail");

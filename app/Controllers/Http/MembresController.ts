@@ -4,7 +4,6 @@ import Env from "@ioc:Adonis/Core/Env";
 import jwt from "jsonwebtoken";
 import Mail from "@ioc:Adonis/Addons/Mail";
 import Application from "@ioc:Adonis/Core/Application";
-import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class MembresController {
   public async addMember({ request, response, auth }: HttpContextContract) {
@@ -169,26 +168,7 @@ export default class MembresController {
     }
     response.finish();
   }
-  public async all({ request, response }: HttpContextContract) {
-    const page = request.input("page", 1);
-    const limit = 10;
-    const users = await Database.from("membres").paginate(page, limit);
-    users.forEach((item) => {
-      const datenais = new Date(item.date_naissance);
-      const day =
-        datenais.getDate() < 10
-          ? "0" + datenais.getDate().toString()
-          : datenais.getDate().toString();
-      const month =
-        datenais.getMonth() + 1 < 10
-          ? "0" + (datenais.getMonth() + 1)
-          : datenais.getMonth() + 1;
-      item.date_naissance = day + "-" + month + "-" + datenais.getFullYear();
-    });
-    response.status(200);
-    response.send({ items: users });
-    response.finish();
-  }
+  
   public async resetpassFindUser({ request, response }: HttpContextContract) {
     const { username }: any = request.qs();
     try {
