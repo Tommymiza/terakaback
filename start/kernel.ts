@@ -40,7 +40,3 @@ Server.middleware.register([
 | Route.get('dashboard', 'UserController.dashboard').middleware('auth')
 |
 */
-Server.middleware.registerNamed({
-  verifyEmail: () => import('App/Middleware/VerifyEmail'),
-  authStaff: () => import('App/Middleware/AuthStaff')
-})
